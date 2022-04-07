@@ -1,0 +1,7 @@
+### Maven template
+target
+.idea
+reports
+.gitignore
+Jenkinsfile
+
