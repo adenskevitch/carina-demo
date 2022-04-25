@@ -1,0 +1,9 @@
+<qa:browsers xmlns:qa="urn:config.gridrouter.qatools.ru">
+    <browser name="firefox" defaultVersion="98.0">
+        <version number="98.0">
+            <region name="1">
+                <host name="host.docker.internal" port="4448" count="1"/>
+            </region>
+        </version>
+    </browser>
+</qa:browsers>

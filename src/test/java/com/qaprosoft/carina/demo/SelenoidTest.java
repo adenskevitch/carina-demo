@@ -15,17 +15,16 @@
  */
 package com.qaprosoft.carina.demo;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import io.cucumber.java.Before;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
@@ -37,7 +36,6 @@ import com.qaprosoft.carina.core.foundation.utils.tag.TestPriority;
 import com.qaprosoft.carina.demo.gui.components.FooterMenu;
 import com.qaprosoft.carina.demo.gui.components.NewsItem;
 import com.qaprosoft.carina.demo.gui.components.compare.ModelSpecs;
-import com.qaprosoft.carina.demo.gui.components.compare.ModelSpecs.SpecType;
 import com.qaprosoft.carina.demo.gui.pages.BrandModelsPage;
 import com.qaprosoft.carina.demo.gui.pages.CompareModelsPage;
 import com.qaprosoft.carina.demo.gui.pages.HomePage;
@@ -49,30 +47,36 @@ import com.qaprosoft.carina.demo.gui.pages.NewsPage;
  *
  * @author qpsdemo
  */
-public class WebSampleTest implements IAbstractTest {
+public class SelenoidTest implements IAbstractTest {
 
     private RemoteWebDriver driver;
 
-    @Before()
-    public void Before() throws Exception {
+    @BeforeClass()
+    public void before() throws Exception {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("browserName", "firefox");
         capabilities.setCapability("browserVersion", "98.0");
-        capabilities.setCapability("selenoid:options", Map.<String, Object>of(
-                "enableVNC", false,
-                "enableVideo", false
-        ));
+//        capabilities.setCapability("selenoid:options", Map.<String, Object>of(
+//                "enableVNC", true,
+//                "enableVideo", true
+//        ));
         driver = new RemoteWebDriver(
-                URI.create("http://localhost:4444/wd/hub").toURL(),
+                URI.create("http://test:test-password@localhost:4444/wd/hub").toURL(),
                 capabilities
         );
+    }
+    @Test()
+    public void opop() {
+        driver.get("http://amazon.com");
     }
 
     @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
     @TestLabel(name = "feature", value = {"web", "regression"})
-    public void testModelSpecs() {
+    public void testModelSpecs() throws Exception {
+
+
         // Open GSM Arena home page and verify page is opened
         HomePage homePage = new HomePage(driver);
         homePage.open();
@@ -113,9 +117,9 @@ public class WebSampleTest implements IAbstractTest {
         List<ModelSpecs> specs = comparePage.compareModels("Samsung Galaxy J3", "Samsung Galaxy J5", "Samsung Galaxy J7 Pro");
         // Verify model announced dates
         SoftAssert softAssert = new SoftAssert();
-        softAssert.assertEquals(specs.get(0).readSpec(SpecType.ANNOUNCED), "2016, March 31");
-        softAssert.assertEquals(specs.get(1).readSpec(SpecType.ANNOUNCED), "2015, June 19");
-        softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
+        softAssert.assertEquals(specs.get(0).readSpec(ModelSpecs.SpecType.ANNOUNCED), "2016, March 31");
+        softAssert.assertEquals(specs.get(1).readSpec(ModelSpecs.SpecType.ANNOUNCED), "2015, June 19");
+        softAssert.assertEquals(specs.get(2).readSpec(ModelSpecs.SpecType.ANNOUNCED), "2017, June");
         softAssert.assertAll();
     }
 

@@ -1,17 +1,55 @@
-version: "3.9"
-
+version: '3'
 services:
-  v2:
-    build: .
-    environment:
-      API_SUITE: api
+  selenoid:
+    network_mode: bridge
+    image: aerokube/selenoid:latest-release
+    container_name: "selenoid"
     volumes:
-      - ./dockertarget:/target
-
-  v3:
-
-    build: .
+      - "/Users/adenskevitch/projects/carina-demo/selenoid:/etc/selenoid"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "$PWD/selenoid/video:/opt/selenoid/video"
+      - "$PWD/selenoid/logs:/opt/selenoid/logs"
     environment:
-      API_SUITE: api
+      - OVERRIDE_VIDEO_OUTPUT_DIR=$PWD/selenoid/video
+    command: ["-conf", "/etc/selenoid/browsers.json", "-video-output-dir", "/etc/selenoid/video", "-log-output-dir", "/etc/selenoid/logs"]
+    ports:
+      - "4448:4444"
+  ggr:
+    image: aerokube/ggr:latest-release
+    container_name: ggr
     volumes:
-      - ./dockertargetv3:/target
+      - "/Users/adenskevitch/projects/carina-demo/grid-router/:/etc/grid-router:ro"
+    depends_on:
+      - selenoid
+    ports:
+      - "4444:4444"
+
+#  ggr-ui:
+#    image: aerokube/ggr-ui:latest-release
+#    container_name: ggr-ui
+#    depends_on:
+#      - ggr
+#
+#  selenoid-ui:
+#    image: aerokube/selenoid-ui
+#    container_name: "selenoid-ui"
+#    network_mode: bridge
+#    links:
+#      - selenoid
+#    hostname: "selenoid.example.com"
+#    ports:
+#      - "8088:8080"
+#    command: ["--selenoid-uri","http://localhost:4444"]
+#  jenkins:
+#    image: "jenkins:latest"
+#    container_name: "jenkins"
+#    volumes:
+#      - "/home/sysadm/rmo_test_docker/jenkins:/var/jenkins_home"
+#      - "/var/run/docker.sock:/var/run/docker.sock"
+#    environment:
+#      JENKINS_HOST_HOME: "/home/sysadm/jenkins_home"
+#    ports:
+#      - 8088:8080
+#      - 5000:5000
+#      - 50000:50000
+

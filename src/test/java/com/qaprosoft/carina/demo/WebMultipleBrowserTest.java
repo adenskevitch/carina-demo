@@ -18,17 +18,20 @@ package com.qaprosoft.carina.demo;
 import com.qaprosoft.carina.core.foundation.IAbstractTest;
 import com.qaprosoft.carina.core.foundation.utils.ownership.MethodOwner;
 import com.qaprosoft.carina.core.foundation.webdriver.Screenshot;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.ChromeCapabilities;
-import com.qaprosoft.carina.core.foundation.webdriver.core.capability.impl.desktop.FirefoxCapabilities;
 import com.qaprosoft.carina.demo.gui.components.NewsItem;
 import com.qaprosoft.carina.demo.gui.pages.HomePage;
 import com.qaprosoft.carina.demo.gui.pages.NewsPage;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This sample shows how initialize multiple drivers and run the tests on different browsers.
@@ -37,23 +40,53 @@ import java.util.List;
  */
 public class WebMultipleBrowserTest implements IAbstractTest {
 
+    private RemoteWebDriver operaDriver;
+    private RemoteWebDriver firefoxDriver;
+
+    @BeforeClass()
+    public void before() throws Exception {
+        DesiredCapabilities operaCapabilities = new DesiredCapabilities();
+        operaCapabilities.setCapability("browserName", "firefox");
+        operaCapabilities.setCapability("browserVersion", "98.0");
+        operaCapabilities.setCapability("selenoid:options", Map.<String, Object>of(
+                "enableVNC", true,
+                "enableVideo", false
+        ));
+        operaDriver = new RemoteWebDriver(
+                URI.create("http://localhost:4444/wd/hub").toURL(),
+                operaCapabilities
+        );
+
+        DesiredCapabilities firefox97Capabilities = new DesiredCapabilities();
+        firefox97Capabilities.setCapability("browserName", "firefox");
+        firefox97Capabilities.setCapability("browserVersion", "97.0");
+        firefox97Capabilities.setCapability("selenoid:options", Map.<String, Object>of(
+                "enableVNC", true,
+                "enableVideo", false
+        ));
+        firefoxDriver = new RemoteWebDriver(
+                URI.create("http://localhost:4444/wd/hub").toURL(),
+                firefox97Capabilities
+        );
+    }
+
     @Test
     @MethodOwner(owner = "qpsdemo")
     public void multipleBrowserTest() {
-        HomePage chromeHomePage = new HomePage(getDriver("chrome", new ChromeCapabilities().getCapability("Chrome Test")));
-        chromeHomePage.open();
-        Assert.assertTrue(chromeHomePage.isPageOpened(), "Chrome home page is not opened!");
+        HomePage operaHomePage = new HomePage(operaDriver);
+        operaHomePage.open();
+        Assert.assertTrue(operaHomePage.isPageOpened(), "Chrome home page is not opened!");
 
-        HomePage firefoxHomePage = new HomePage(getDriver("firefox", new FirefoxCapabilities().getCapability("Firefox Test")));
-        firefoxHomePage.open();
-        Assert.assertTrue(firefoxHomePage.isPageOpened(), "Firefox home page is not opened!");
-        Assert.assertEquals(firefoxHomePage.getDriver().getTitle(), "GSMArena.com - mobile phone reviews, news, specifications and more...");
-        Screenshot.capture(firefoxHomePage.getDriver(), "Firefox capture!");
+        HomePage firefox97HomePage = new HomePage(firefoxDriver);
+        firefox97HomePage.open();
+        Assert.assertTrue(firefox97HomePage.isPageOpened(), "Firefox home page is not opened!");
+        Assert.assertEquals(firefox97HomePage.getDriver().getTitle(), "GSMArena.com - mobile phone reviews, news, specifications and more...");
+        Screenshot.capture(firefox97HomePage.getDriver(), "Firefox capture!");
 
-        NewsPage newsPage = chromeHomePage.getFooterMenu().openNewsPage();
+        NewsPage newsPage = operaHomePage.getFooterMenu().openNewsPage();
         final String searchQ = "iphone";
         List<NewsItem> news = newsPage.searchNews(searchQ);
-        Screenshot.capture(chromeHomePage.getDriver(), "Chrome capture!");
+        Screenshot.capture(operaHomePage.getDriver(), "Chrome capture!");
         Assert.assertFalse(CollectionUtils.isEmpty(news), "News not found!");
 
         for(NewsItem n : news) {
