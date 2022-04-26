@@ -15,11 +15,16 @@
  */
 package com.qaprosoft.carina.demo;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
@@ -44,21 +49,39 @@ import com.qaprosoft.carina.demo.gui.pages.NewsPage;
  * @author qpsdemo
  */
 public class WebSampleTest implements IAbstractTest {
+
+    private RemoteWebDriver driver;
+
+    @BeforeSuite
+    public void Before() throws Exception {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability("browserName", "firefox");
+        capabilities.setCapability("browserVersion", "98.0");
+        capabilities.setCapability("selenoid:options", Map.<String, Object>of(
+                "enableVNC", false,
+                "enableVideo", false
+        ));
+        driver = new RemoteWebDriver(
+                URI.create("http://test:test-password@localhost:4444/wd/hub").toURL(),
+                capabilities
+        );
+    }
+
     @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestPriority(Priority.P3)
     @TestLabel(name = "feature", value = {"web", "regression"})
     public void testModelSpecs() {
         // Open GSM Arena home page and verify page is opened
-        HomePage homePage = new HomePage(getDriver());
+        HomePage homePage = new HomePage(driver);
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
-        
+
         //Closing advertising if it's displayed
         homePage.getWeValuePrivacyAd().closeAdIfPresent();
-        
+
         // Select phone brand
-        homePage = new HomePage(getDriver());
+        homePage = new HomePage(driver);
         BrandModelsPage productsPage = homePage.selectBrand("Samsung");
         // Select phone model
         ModelInfoPage productInfoPage = productsPage.selectModel("Galaxy A52 5G");
@@ -78,7 +101,7 @@ public class WebSampleTest implements IAbstractTest {
     @TestLabel(name = "feature", value = {"web", "acceptance"})
     public void testCompareModels() {
         // Open GSM Arena home page and verify page is opened
-        HomePage homePage = new HomePage(getDriver());
+        HomePage homePage = new HomePage(driver);
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened");
         // Open model compare page
@@ -94,23 +117,23 @@ public class WebSampleTest implements IAbstractTest {
         softAssert.assertEquals(specs.get(2).readSpec(SpecType.ANNOUNCED), "2017, June");
         softAssert.assertAll();
     }
-    
+
     @Test()
     @MethodOwner(owner = "qpsdemo")
     @TestLabel(name = "feature", value = {"web", "acceptance"})
     public void testNewsSearch() {
-        HomePage homePage = new HomePage(getDriver());
+        HomePage homePage = new HomePage(driver);
         homePage.open();
         Assert.assertTrue(homePage.isPageOpened(), "Home page is not opened!");
-        
+
         NewsPage newsPage = homePage.getFooterMenu().openNewsPage();
         Assert.assertTrue(newsPage.isPageOpened(), "News page is not opened!");
-        
+
         final String searchQ = "iphone";
         List<NewsItem> news = newsPage.searchNews(searchQ);
         Assert.assertFalse(CollectionUtils.isEmpty(news), "News not found!");
         SoftAssert softAssert = new SoftAssert();
-        for(NewsItem n : news) {
+        for (NewsItem n : news) {
             System.out.println(n.readTitle());
             softAssert.assertTrue(StringUtils.containsIgnoreCase(n.readTitle(), searchQ),
                     "Invalid search results for " + n.readTitle());
