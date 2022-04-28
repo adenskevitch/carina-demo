@@ -14,6 +14,7 @@
 	<parameter name="jenkinsJobExecutionOrder" value="1"/>
 	<parameter name="jenkinsJobExecutionMode" value="continue"/>
 	<parameter name="jenkinsAutoScreenshot" value="true"/>
+	<parameter name="provider" value="selenium"/>
 
 	<test name="GSM arena web tests">
 		<classes>
