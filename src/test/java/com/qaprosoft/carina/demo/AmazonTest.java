@@ -8,7 +8,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import static com.zebrunner.agent.core.webdriver.RemoteWebDriverFactory.getDriver;
 
 public class AmazonTest extends AbstractTest {
 

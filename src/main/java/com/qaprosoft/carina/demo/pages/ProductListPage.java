@@ -1,6 +1,5 @@
 package com.qaprosoft.carina.demo.pages;
 
-import com.solvd.newtestproject.service.WaiteService;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -17,7 +16,6 @@ public class ProductListPage extends AbstractPage {
     }
 
     public List<WebElement> getProducts() {
-        WaiteService.waitElements(driver, products);
         return products;
     }
 }
