@@ -17,6 +17,7 @@ package com.qaprosoft.carina.demo.gui.pages.localizationSample;
 
 import java.util.List;
 
+import com.qaprosoft.carina.core.foundation.webdriver.locator.ExtendedFindBy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
 
